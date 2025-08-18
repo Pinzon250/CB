@@ -1,0 +1,25 @@
+from fastapi import FastAPI
+from sqlalchemy import text
+from app.database.session import engine
+from app.database.base import Base
+
+from app.database.models import *
+
+app = FastAPI(title="Cibercity API")
+
+def create_schemas():
+    with engine.begin() as conn:
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "auth"'))
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "catalog"'))
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "content"'))
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "orders"'))
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "payments"'))
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "reviews"'))
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "shipping"'))
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "promotions"'))
+        conn.execute(text('CREATE SCHEMA IF NOT EXISTS "support"'))
+
+@app.on_event("startup")
+def on_startup():
+    create_schemas()
+    Base.metadata.create_all(bind=engine)
