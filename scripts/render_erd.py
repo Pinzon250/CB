@@ -11,12 +11,11 @@ from app.database import models as _models  # noqa: F401  # fuerza import de mod
 # 2) Se obtiene un SQLAlchemy Engine 
 engine = None
 try:
-    # si ya tienes engine en tu código (ajusta el path según tu proyecto)
-    from app.database.session import engine as _engine  # p.ej. session.py
+    from app.database.session import engine as _engine
     engine = _engine
 except Exception:
     try:
-        from app.database.session import engine as _engine  # alternativa
+        from app.database.session import engine as _engine 
         engine = _engine
     except Exception:
         from sqlalchemy import create_engine
@@ -28,9 +27,9 @@ except Exception:
         engine = create_engine(DATABASE_URL)
 
 # 3) Diagnósticos útiles
-print("🧪 Tablas en Base.metadata:", len(Base.metadata.tables))
-print("   Ejemplos:", list(Base.metadata.tables.keys())[:8])
-print("🧪 dot.exe:", shutil.which("dot") or "NO ENCONTRADO (instala Graphviz)")
+print("Tablas en Base.metadata:", len(Base.metadata.tables))
+print("Ejemplos:", list(Base.metadata.tables.keys())[:8])
+print("dot.exe:", shutil.which("dot") or "NO ENCONTRADO (instala Graphviz)")
 
 # 4) Generar el diagrama
 from sqlalchemy_schemadisplay import create_schema_graph

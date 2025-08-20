@@ -26,3 +26,15 @@ async def send_verification_email(email: str, token: str):
         subtype="plain"
     )
     await fm.send_message(msg)
+
+async def send_reset_email(email: str, token: str):
+    base = (settings.FRONT_URL or "").rstrip("/")
+    link = f"{base}/auth/reset-password?token={token}"
+    msg = MessageSchema(
+        subject="Recupera tu contraseña - Cibercity",
+        recipients=[email],
+        body=f"Hola,\n\nRestablece tu contraseña aqui (15m):\n{link}\n\nSi no fuiste tu, ignora este mensaje",
+        subtype="plain"
+    )
+
+    await fm.send_message(msg)
