@@ -10,7 +10,7 @@ from app.modules.reviews import *
 
 __all__ = [
     "User", "Role", "UserRole", # Auth models
-    "Product", "Category", "Brand", "ProductImage", "Attribute", "ProductAttribute", "Wishlist", "Vendor", "ProductSupplier", "ProductVariant", "VariantOptions", # Catalog Models
+    "Product", "Category", "Brand", "ProductImage", "Attribute", "ProductAttribute", "Wishlist", "Vendor", "ProductSupplier", "ProductVariant", "VariantOption", # Catalog Models
     "CartItem", "Order", "OrderItem", "OrderStatus", "Cart", "PurchaseOrderItem", "PurchaseOrder", # Order Models
     "PaymentMethod", "Transaction", "Refund", # Payment Models
     "Address", "Carrier", "Shipment", "ShipmentItem", "TrackingEvent", # Shipping Models

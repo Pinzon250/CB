@@ -7,5 +7,5 @@ from .attribute import Attribute
 from .vendor import Vendor
 from .product_suppliers import ProductSupplier
 from .product_variant import ProductVariant
-from .variant_options import VariantOptions
+from .variant_options import VariantOption
 from .wishlist import Wishlist

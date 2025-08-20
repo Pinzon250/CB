@@ -1,11 +1,10 @@
 import uuid
-from datetime import datetime
-from sqlalchemy import Column, String, DateTime, Numeric, Integer, ForeignKey, UniqueConstraint, CheckConstraint
+from sqlalchemy import Column, String, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.database.base import Base
 
-class VariantOptions(Base):
+class VariantOption(Base):
     __tablename__ = "variant_options"
     __table_args__ = (
         UniqueConstraint("variant_id", "attribute_id", name="uq_variant_attr"),
