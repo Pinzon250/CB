@@ -5,6 +5,11 @@ from app.database.base import Base
 
 from app.database.models import *
 
+# Routers fastapi
+from app.api.v1.storefront import *
+
+
+# Inicializacion de fastapi
 app = FastAPI(title="Cibercity API")
 
 def create_schemas():
@@ -23,3 +28,6 @@ def create_schemas():
 def on_startup():
     create_schemas()
     Base.metadata.create_all(bind=engine)
+
+# Routers
+app.include_router(account.router)
