@@ -24,7 +24,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 config = context.config
 
 # Sobrescribir la URL del archivo .ini con la del entorno
-SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE_URL")
+SQLALCHEMY_DATABASE_URL = os.getenv("SQLALCHEMY_DATABASE")
 if SQLALCHEMY_DATABASE_URL:
     config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
 
