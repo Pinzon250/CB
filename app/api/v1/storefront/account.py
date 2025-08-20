@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends, status, BackgroundTasks, Query
+from fastapi import APIRouter, Depends, status, BackgroundTasks, Query, Response
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from app.utils.email import send_verification_email
+from app.utils.email import send_verification_email, send_reset_email
 from app.database.session import get_db
 from app.modules.auth.service import AuthService
-from app.modules.auth.schemas.public import LoginRequest, TokenResponse, AuthResponse, RegisterRequest, UserPublic
+from app.modules.auth.schemas.public import LoginRequest, TokenResponse, AuthResponse, RegisterRequest, UserPublic, ForgotPasswordRequest, ResetPasswordRequest
 
 router = APIRouter(
     prefix="/api/v1/auth",
@@ -39,3 +39,16 @@ def register(body: RegisterRequest, background_tasks: BackgroundTasks, db: Sessi
 def verify_account(token: str = Query(...), db: Session = Depends(get_db)):
     user = AuthService(db).verify_email(token)
     return UserPublic.model_validate(user)
+
+@router.post("/forgot-password", status_code=status.HTTP_204_NO_CONTENT)
+def forgot_password(body: ForgotPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
+    token = AuthService(db).request_password_reset(body)
+    # No revelar si existe o no: siempre 204
+    if token:
+        background_tasks.add_task(send_reset_email, body.email, token)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+@router.post("/reset-password", status_code=status.HTTP_204_NO_CONTENT)
+def reset_password(body: ResetPasswordRequest, db: Session = Depends(get_db)):
+    AuthService(db).reset_password(body)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)

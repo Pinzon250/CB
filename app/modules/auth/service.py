@@ -2,7 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.core.security import verify_password, create_access_token, hash_password, create_purpose_token, decode_purpose_token
 from .repository import UserRepositoy
-from .schemas.public import LoginRequest, RegisterRequest
+from .schemas.public import LoginRequest, RegisterRequest, ForgotPasswordRequest, ResetPasswordRequest
 from typing import Tuple
 from datetime import datetime, timezone
 
@@ -67,7 +67,30 @@ class AuthService:
         token = create_purpose_token(sub=data.email, purpose="verify", minutes=60*24)
         
         return user, token
+    # ----------- PASSWORDS -----------
+    def request_password_reset(self, data: ForgotPasswordRequest) -> str | None:
+        """Devolver un token si el usuario existe; si no, None(No se revela su existencia)""" 
+        user = self.users.get_by_email(data.email)
+        if not user:
+            return None
+        # Verificar estados (is_active, deleted_at, banned_until...)
+        token = create_purpose_token(sub=user.email, purpose="reset", minutes=15)
+        return token
     
+    def reset_password(self, data: ResetPasswordRequest) -> None:
+        try:
+            payload = decode_purpose_token(data.token, expected_purpose="reset")
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Token invalido o expirado")
+        
+        email = payload["sub"]
+        user = self.users.get_by_email(email)
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+        self.user.set_password(user, hash_password(data.new_password))
+        self.db.commit()
+     
     # ----------- VERIFY EMAIL -----------
     def verify_email(self, token: str):
         payload = decode_purpose_token(token, expected_purpose="verify")
@@ -80,3 +103,58 @@ class AuthService:
         self.db.commit()
         self.db.refresh(user)
         return user
+    
+    # ----------- GOOGLE -----------
+    def google_upsert_and_token(self, info: dict):
+        email = info.get("email")
+        sub = info.get("sub")
+        if not email or not sub:
+            raise HTTPException(status_code=400, detail="Perfil de google invalido")
+        
+        # Primero busca por google_sub
+        user = self.users.get_by_google_sub(sub)
+        
+        # Si no, busca por el email (es el primer vinculo SSO)
+        if not user:
+            user = self.users.get_by_email(email)
+            if user:
+                # Vincula SSO a la cuenta existente
+                self.users.link_google_sub(user, sub)
+            else:
+                # Crea la cuenta nueva
+                user = self.user.create_user(
+                    email=email,
+                    first_name=info.get("given_name"),
+                    last_name=info.get("family_name"),
+                    verified=bool(info.get("email_verified", False)),
+                    is_active=True,
+                    google_sub=sub
+                )
+
+                # Rol predeterminado
+                self.users.add_role_by_name(user.id, "customer")
+
+        # Se actualiza el perfil y sus estados
+        self.users.update_profile_from_google(
+            user,
+            first_name=info.get("given_name"),
+            last_name=info.get("family_name"),
+            picture_url=info.get("picture"),
+            email_verified=info.get("email_verified"),
+        )
+
+        # Declaramos las reglas de acceso
+        if getattr(user, "deleted_at", None):
+            raise HTTPException(status_code=403, detail="Cuenta eliminada")
+        if not getattr(user, "is_active", True):
+            raise HTTPException(status_code=403, detail="Cuenta deshabilitada")
+        
+        # Actualizar cambios en la base de datos
+        self.db.commit()
+        self.db.refresh(user)
+
+        # Token con sus roles
+        roles = self.users.get_roles(user.id)
+        access = create_access_token(user_id=str(user.id), roles=roles)
+
+        return access, user, roles

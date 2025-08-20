@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, ForeignKey, DateTime, Boolean
+from sqlalchemy import Column, String, ForeignKey, DateTime, Boolean, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from app.database.base import Base
@@ -40,6 +40,9 @@ class User(Base):
     verified = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     token_verification = Column(String(100), nullable=True)
+
+    picture_url = Column(String, nullable=True)
+    google_sub = Column(Text, unique=True, nullable=True)
 
     last_login_at = Column(DateTime, nullable=True)
     banned_until = Column(DateTime, nullable=True)

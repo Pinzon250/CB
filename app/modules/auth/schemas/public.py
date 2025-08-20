@@ -36,3 +36,11 @@ class UserPublic(BaseModel):
     model_config = {
         "from_attributes": True
     }
+
+# ------- FORGOT/RESET PASSWORD -------
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str = Field(min_length=8)

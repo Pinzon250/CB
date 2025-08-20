@@ -48,6 +48,34 @@ class UserRepositoy:
     def set_verified(self, user: User):
         user.verified = True
 
+    def set_password(self, user: User, password_hash: str) -> None:
+        user.password = password_hash
+
     # Un helper para flags de estado
     def is_banned(self, user: User) -> bool:
         return bool(user.banned_until and user.banned_until > datetime.now(timezone.utc))
+    
+    # ------------------ GOOGLE AUTH ------------------
+    def get_by_google_sub(self, sub: str) -> Optional[User]:
+        return self.db.query(User).filter(User.google_sub == sub).first()
+    
+    def update_profile_from_google(
+            self,
+            user: User,
+            *,
+            first_name: str|None,
+            last_name: str|None,
+            picture_url: str|None,
+            email_verified: bool|None
+        ):
+        if first_name: user.first_name = first_name
+        if last_name: user.last_name = last_name
+        if picture_url is not None and hasattr(user, "picture_url"):
+            user.picture_url = picture_url
+        if email_verified is True:
+            user.verified = True
+        user.last_login_at = datetime.now(timezone.utc)
+
+    def link_google_sub(self, user: User, sub: str):
+        user.google_sub = sub
+

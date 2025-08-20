@@ -31,3 +31,4 @@ def on_startup():
 
 # Routers
 app.include_router(account.router)
+app.include_router(google_oauth.router)
