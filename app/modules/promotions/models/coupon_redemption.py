@@ -1,4 +1,3 @@
-# models/promotions/coupon_redemption.py
 import uuid
 from datetime import datetime
 from sqlalchemy import Column, DateTime, Numeric, ForeignKey, UniqueConstraint

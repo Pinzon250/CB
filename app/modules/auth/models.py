@@ -2,6 +2,7 @@ import uuid
 from sqlalchemy import Column, String, ForeignKey, DateTime, Boolean, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.associationproxy import association_proxy
 from app.database.base import Base
 from datetime import datetime
 
@@ -21,8 +22,8 @@ class UserRole(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("auth.users.id", ondelete="CASCADE"))
     role_id = Column(UUID(as_uuid=True), ForeignKey("auth.roles.id", ondelete="CASCADE"))
 
-    user = relationship("User", back_populates="roles")
-    role = relationship("Role")
+    user = relationship("User", back_populates="role_links")
+    role = relationship("Role", lazy="joined")
 
 class User(Base):
     __tablename__ = "users"
@@ -51,5 +52,9 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    roles = relationship("UserRole", back_populates="user", cascade="all, delete-orphan")
+    role_links = relationship("UserRole", back_populates="user", cascade="all, delete-orphan", lazy="selectin")
+
+    roles = association_proxy("role_links", "role")
+    role_names = association_proxy("role_links", "role.name")
+
     addresses = relationship("Address", back_populates="user", cascade="all, delete-orphan")

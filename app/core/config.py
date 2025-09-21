@@ -1,10 +1,25 @@
+from pathlib import Path
 from pydantic import Field, AliasChoices
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from dotenv import load_dotenv, find_dotenv
+
+# Localiza el .env
+_env_file = find_dotenv(filename=".env", usecwd=True)
+if not _env_file:
+    candidate = (Path(__file__).resolve().parent / ".env")
+    if candidate.exists():
+        _env_file = str(candidate)
+
+# Si no lo encuentra mostrar mensaje de error
+if not _env_file:
+    raise RuntimeError(
+        "No se encontró el archivo .env."
+    )
+
+load_dotenv(_env_file, override=False)
 
 class Settings(BaseSettings):
-    # Esto lee el .env, no es sensible a mayusculas y minusculas y no falla por claves extra
     model_config = SettingsConfigDict(
-        env_file=".env",
         case_sensitive=False,
         extra="ignore",
     )
@@ -14,9 +29,9 @@ class Settings(BaseSettings):
         ...,
         validation_alias=AliasChoices(
             "DATABASE_URL",
-            "SQLALCHEMY_DATABASE_URI",
-            "sqlalchemy_database",
-            "SQLDATABASE_DATABASE",  
+            "SQLALCHEMY_DATABASE_URL",
+            "SQLALCHEMY_DATABASE_RW",
+            "SQLALCHEMY_DATABASE_LH",
         ),
     )
 
@@ -24,8 +39,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str = Field(
         ...,
         validation_alias=AliasChoices(
-            "SECRET_KEY",
             "AUTH_SECRET_KEY",
+            "SECRET_KEY",
+            "SESSION_SECRET_KEY",
             "session_secret_key",
             "auth_secret_key",
         ),
@@ -34,19 +50,17 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(
         default=60,
         validation_alias=AliasChoices(
-            "ACCESS_TOKEN_EXPIRE_MINUTES",
-            "ACCESS_TOKEN_MINUTES",
-            "TOKEN_MINUTES",
+            "ACCESS_TOKEN_EXPIRE_MINUTES", "ACCESS_TOKEN_MINUTES", "TOKEN_MINUTES",
         ),
     )
 
-    # --- Front/URLs ---
+    # --- Front / URLs ---
     FRONT_URL: str | None = Field(default=None, validation_alias=AliasChoices("FRONT_URL"))
 
-    # --- CONFIGURACION DE EMAIL ---
-    MAIL_USERNAME: str | None = Field(default=None, validation_alias=AliasChoices("MAIL_USERNAME", "email_origen"))
+    # --- Email ---
+    MAIL_USERNAME: str | None = Field(default=None, validation_alias=AliasChoices("MAIL_USERNAME", "EMAIL_ORIGEN", "email_origen"))
     MAIL_PASSWORD: str | None = Field(default=None, validation_alias=AliasChoices("MAIL_PASSWORD"))
-    MAIL_FROM: str | None = Field(default=None, validation_alias=AliasChoices("MAIL_FROM", "email_origen"))
+    MAIL_FROM: str | None = Field(default=None, validation_alias=AliasChoices("MAIL_FROM", "EMAIL_ORIGEN", "email_origen"))
     MAIL_SERVER: str = Field(default="smtp.gmail.com", validation_alias=AliasChoices("MAIL_SERVER"))
     MAIL_PORT: int = Field(default=587, validation_alias=AliasChoices("MAIL_PORT"))
     MAIL_STARTTLS: bool = Field(default=True, validation_alias=AliasChoices("MAIL_STARTTLS"))

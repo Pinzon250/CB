@@ -1,4 +1,3 @@
-# models/promotions/coupon_brand.py
 import uuid
 from sqlalchemy import Column, ForeignKey, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID

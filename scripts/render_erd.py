@@ -6,7 +6,7 @@ sys.path.insert(0, str(ROOT))               # hace importable 'app'
 
 # 1) Carga Base y registra TODOS los modelos
 from app.database.base import Base
-from app.database import models as _models  # noqa: F401  # fuerza import de modelos
+from app.database import models as _models  # noqa: F401 fuerza import de modelos
 
 # 2) Se obtiene un SQLAlchemy Engine 
 engine = None
@@ -22,7 +22,6 @@ except Exception:
         DATABASE_URL = (
             os.getenv("DATABASE_URL")
             or os.getenv("SQLALCHEMY_DATABASE_URI")
-            or "postgresql+psycopg2://user:password@localhost:5432/cibercity"
         )
         engine = create_engine(DATABASE_URL)
 

@@ -1,19 +1,17 @@
 from sqlalchemy import create_engine
-from .models import *
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
-import os
 
+from .models import *
 from .base import *
 
-# Load environment variables
-load_dotenv()
-
-# Import DB URL
-SQLALCHEMY_DATABASE = os.getenv("SQLALCHEMY_DATABASE")
+from app.core.config import settings
 
 # Create an engine
-engine = create_engine(SQLALCHEMY_DATABASE)
+engine = create_engine(
+    settings.DATABASE_URL,
+    pool_pre_ping=True,
+    future=True
+)
 
 
 # Create a session

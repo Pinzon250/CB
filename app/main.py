@@ -8,6 +8,10 @@ from app.database.models import *
 # Routers fastapi
 from app.api.v1.storefront import *
 
+# admin routers
+from app.api.v1.admin import catalog as catalog_adm
+from app.api.v1.admin import auth
+
 
 # Inicializacion de fastapi
 app = FastAPI(title="Cibercity API")
@@ -29,6 +33,11 @@ def on_startup():
     create_schemas()
     Base.metadata.create_all(bind=engine)
 
-# Routers
+# Routers public
 app.include_router(account.router)
 app.include_router(google_oauth.router)
+app.include_router(catalog.router)
+
+# Routers admin
+app.include_router(catalog_adm.router)
+app.include_router(auth.router)

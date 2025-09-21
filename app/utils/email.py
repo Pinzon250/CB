@@ -18,7 +18,7 @@ fm = FastMail(conf)
 async def send_verification_email(email: str, token: str):
     base = (settings.FRONT_URL or "").rstrip("/")
     # Link hacia el frontend
-    link = f"{settings.FRONT_URL}/auth/verify?token={token}"
+    link = f"{base}/auth/verify?token={token}"
     msg = MessageSchema(
         subject="Verifica tu cuenta - Cibercity",
         recipients=[email],
