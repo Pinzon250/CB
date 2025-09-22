@@ -1,8 +1,8 @@
 from fastapi import HTTPException, status
 from typing import Optional, Tuple, List
 from sqlalchemy.orm import Session
-from app.modules.catalog.repository import ProductRepository
-from app.modules.catalog.schemas.admin import AdminProductListItem, AdminProductDetail, AdminProductAttribute, AdminProductCreate, AdminProductImageIn, AdminProductUpdate
+from app.modules.catalog.repository import ProductRepository, CategoryRepository, BrandRepository
+from app.modules.catalog.schemas.admin import AdminProductListItem, AdminProductDetail, AdminProductAttribute, AdminProductCreate, AdminProductImageIn, AdminProductUpdate, AdminBrandCreate, AdminBrandOut, AdminCategoryCreate, AdminCategoryOut
 from app.modules.catalog.schemas.public import PublicProductListItem, PublicProductAttribute, PublicProductDetail
 
 class ProductService:
@@ -210,3 +210,47 @@ class ProductService:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
         ProductRepository.soft_delete(db, p)
         db.commit()
+
+    # Categorias
+    @staticmethod
+    def create_category(db: Session, dto: AdminCategoryCreate) -> AdminCategoryOut:
+        try:
+            c = CategoryRepository.create(db, name=dto.name, slug=dto.slug, parent_id=str(dto.parent_id) if dto.parent_id else None)
+            db.commit(); db.refresh(c)
+        except ValueError as e:
+            db.rollback()
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        return AdminCategoryOut.model_validate(c)
+    
+    @staticmethod
+    def delete_category(db: Session, category_id: str) -> None:
+        c = CategoryRepository.get(db, category_id)
+        if not c:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Categoria no encontrada")
+        if CategoryRepository.products_count(db, category_id) > 0:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La categoria tiene productos asignados")
+        if CategoryRepository.children_count(db, category_id) > 0:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La categoria tiene categorias hijas")
+        CategoryRepository.delete(db, c); db.commit()
+
+    # Marcas
+    def create_brand(db: Session, dto: AdminBrandCreate) -> AdminBrandOut:
+        try:
+            b = BrandRepository.create(db, name=dto.name, slug=dto.slug)
+            db.commit(); db.refresh(b)
+        except Exception as e:
+            db.rollback()
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        return AdminBrandOut.model_validate(b)
+    
+    @staticmethod
+    def delete_brand(db: Session, brand_id: str) -> None:
+        b = BrandRepository.get(db, brand_id)
+        if not b:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Marca no encontrada")
+        if BrandRepository.products_count(db, brand_id) > 0:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="La marca tiene productos asociados a ella")
+        BrandRepository.delete(db, b); db.commit()

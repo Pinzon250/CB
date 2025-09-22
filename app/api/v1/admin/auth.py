@@ -8,6 +8,6 @@ router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 def me(user: User = Depends(get_current_user)):
     return {
         "id": str(user.id),
-        "role_names": list(getattr(user, "role_names", [])),  # ["admin", ...]
+        "role_names": list(getattr(user, "role_names", [])),
         "roles": [ {"id": str(r.id), "name": r.name} for r in getattr(user, "roles", []) ],
     }

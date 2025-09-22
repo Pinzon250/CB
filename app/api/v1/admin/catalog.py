@@ -5,7 +5,7 @@ from app.core.deps import require_admin
 from app.database.session import get_db
 
 from app.modules.catalog.schemas import Page, PageMeta
-from app.modules.catalog.schemas.admin import AdminProductDetail, AdminProductCreate, AdminProductImageIn, AdminProductUpdate
+from app.modules.catalog.schemas.admin import AdminProductDetail, AdminProductCreate, AdminProductImageIn, AdminProductUpdate, AdminCategoryOut, AdminCategoryCreate, AdminBrandOut, AdminBrandCreate
 from app.modules.catalog.service import ProductService
 
 router = APIRouter(
@@ -82,4 +82,28 @@ def delete_product(
     db: Session = Depends(get_db)
 ):
     ProductService.soft_delete_product(db, product_id)
+    return None
+
+# CATEGORIAS ---------
+# Crear categoria
+@router.post("/categories/create", response_model=AdminCategoryOut, status_code=status.HTTP_201_CREATED)
+def create_category(payload: AdminProductCreate, db: Session = Depends(get_db)):
+    return ProductService.create_category(db, payload)
+
+# eliminar Categoria
+@router.delete("/categories/delete/{category_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_category(category_id: str, db: Session = Depends(get_db)):
+    ProductService.delete_category(db, category_id)
+    return None
+
+# Marcas ---------
+# Crear marca
+@router.post("/brands/create", response_model=AdminBrandOut, status_code=status.HTTP_201_CREATED)
+def create_brand(payload: AdminBrandCreate, db: Session = Depends(get_db)):
+    return ProductService.create_brand(db, payload)
+
+# eliminar Marca
+@router.delete("/brands/delete/{brand_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_brand(brand_id: str, db: Session = Depends(get_db)):
+    ProductService.delete_brand(db, brand_id)
     return None

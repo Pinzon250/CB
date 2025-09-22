@@ -63,3 +63,37 @@ class AdminProductUpdate(BaseModel):
 
 class AdminProductImageIn(BaseModel):
     url: str
+
+# Marcas (Brands)
+class AdminBrandCreate(BaseModel):
+    name: str = Field(min_length=1)
+    slug: Optional[str] = None
+
+class AdminBrandOut(BaseModel):
+    id: UUID4
+    name: str
+    slug: str
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {
+        "from_attributes": True
+    }
+
+# Categorias (Categories)
+class AdminCategoryCreate(BaseModel):
+    name: str = Field(min_length=1)
+    slug: Optional[str] = None
+    parent_id: Optional[UUID4] = None
+
+class AdminCategoryOut(BaseModel):
+    id: UUID4
+    name: str
+    slug: str
+    parent_id: Optional[UUID4] = None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {
+        "from_attributes": True
+    }

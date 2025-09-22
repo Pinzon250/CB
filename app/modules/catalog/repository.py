@@ -280,3 +280,82 @@ class ProductRepository:
     def soft_delete(db: Session, product: Product) -> None:
         product.is_active = False
         db.flush()
+
+# Repositorio de marcas
+class BrandRepository:
+
+    @staticmethod
+    def exists_slug(db: Session, slug: str) -> bool:
+        return db.scalar(db.query(func.count(Brand.id).filter(Brand.slug == slug))) > 0
+    
+    # Crear marca
+    @staticmethod
+    def create(db: Session, *, name: str, slug: Optional[str]) -> Brand:
+        final_slug = slug or _slugify(name)
+        base = final_slug
+        i = 1
+        while BrandRepository.exists_slug(db, final_slug):
+            i += 1
+            final_slug = f"{base}-{i}"
+        
+        b = Brand(name=name, slug=final_slug)
+        db.add(b);
+        db.flush()
+        return b
+    
+    @staticmethod
+    def get(db: Session, brand_id: str) -> Optional[Brand]:
+        return db.get(Brand, brand_id)
+    
+    @staticmethod
+    def products_count(db: Session, brand_id: str) -> int:
+        return db.scalar(db.query(func.count(Product.id)).filter(Product.brand_id == brand_id)) or 0
+    
+    @staticmethod
+    def delete(db: Session, brand: Brand) -> None:
+        db.delete(brand); 
+        db.flush()
+
+# Repositorio de categorias
+class CategoryRepository:
+
+    @staticmethod
+    def exists_slug(db: Session, slug: str) -> bool:
+        return db.scalar(db.query(func.count(Category.id)).filter(Category.slug == slug)) > 0
+    
+    @staticmethod
+    def ensure_parent(db: Session, parent_id: Optional[str]) -> None:
+        if parent_id:
+            if not db.get(Category, parent_id):
+                raise ValueError("Categoria padre no encontrada")
+            
+    @staticmethod
+    def create(db: Session, *, name: str, slug: Optional[str], parent_id: Optional[str]) -> Category:
+        final_slug = slug or _slugify(name)
+        base = final_slug
+        i = 1
+        while CategoryRepository.exists_slug(db, final_slug):
+            i += 1
+            final_slug = f"{base}-{i}"
+        CategoryRepository.ensure_parent(db, parent_id)
+        c = Category(name=name, slug=final_slug, parent_id=parent_id if hasattr(Category, "parent_id") else None)
+        db.add(c); db.flush()
+        return c
+    
+    @staticmethod
+    def get(db: Session, category_id: str) -> Optional[Category]:
+        return db.get(Category, category_id)
+    
+    @staticmethod
+    def products_count(db: Session, category_id: str) -> int:
+        return db.scalar(db.query(func.count(Product.id)).filter(Product.category_id == category_id)) or 0
+    
+    @staticmethod
+    def children_count(db: Session, category_id: str) -> int:
+        if not hasattr(Category, "parent_id"):
+            return 0
+        return db.scalar(db.query(func.count(Category.id)).filter(Category.parent_id == category_id)) or 0
+    
+    @staticmethod
+    def delete(db: Session, category: Category) -> None:
+        db.delete(category); db.flush()

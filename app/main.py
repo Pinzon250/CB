@@ -14,7 +14,7 @@ from app.api.v1.admin import auth
 
 
 # Inicializacion de fastapi
-app = FastAPI(title="Cibercity API")
+app = FastAPI(title="Cibercity API V1.0")
 
 def create_schemas():
     with engine.begin() as conn:
