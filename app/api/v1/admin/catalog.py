@@ -87,7 +87,7 @@ def delete_product(
 # CATEGORIAS ---------
 # Crear categoria
 @router.post("/categories/create", response_model=AdminCategoryOut, status_code=status.HTTP_201_CREATED)
-def create_category(payload: AdminProductCreate, db: Session = Depends(get_db)):
+def create_category(payload: AdminCategoryCreate, db: Session = Depends(get_db)):
     return ProductService.create_category(db, payload)
 
 # eliminar Categoria

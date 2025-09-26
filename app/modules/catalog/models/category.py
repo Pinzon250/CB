@@ -13,7 +13,7 @@ class Category(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, unique=True, nullable=False)
-    description = Column(String, nullable=True)
+    slug = Column(String, nullable=False, unique=True)
     parent_id = Column(UUID(as_uuid=True), ForeignKey("catalog.categories.id"), nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)

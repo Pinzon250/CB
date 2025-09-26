@@ -103,6 +103,7 @@ class ProductService:
             id=p.id,
             name=p.name,
             slug=getattr(p, "slug", str(p.id)),
+            description=getattr(p, "description", None),
             price=float(p.price),
             stock=getattr(p, "stock", 0),
             is_active=p.is_active,
@@ -119,7 +120,7 @@ class ProductService:
     def get_public_detail_by_slug(db: Session, slug: str) -> PublicProductDetail:
         p = ProductRepository.get_by_slug(db, slug, only_active=True)
         if not p:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Product not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Producto no encontrado")
 
         images = ProductRepository.get_images(db, p.id)
         attrs_pairs = ProductRepository.get_attributes(db, p.id)
@@ -129,6 +130,7 @@ class ProductService:
             id=p.id,
             name=p.name,
             slug=getattr(p, "slug", slug),
+            description=getattr(p, "description", None),
             price=float(p.price),
             stock=getattr(p, "stock", 0),
             brand_name=getattr(getattr(p, "brand", None), "name", None),

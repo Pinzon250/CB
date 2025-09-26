@@ -25,6 +25,7 @@ class PublicProductAttribute(BaseModel):
 class PublicProductDetail(BaseModel):
     id: UUID4
     name: str
+    description: Optional[str] = None
     slug: str
     price: float
     stock: int

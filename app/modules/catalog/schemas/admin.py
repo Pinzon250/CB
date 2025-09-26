@@ -26,6 +26,7 @@ class AdminProductDetail(BaseModel):
     id: UUID4
     name: str
     slug: str
+    description: Optional[str] = None
     price: float
     stock: int
     is_active: bool

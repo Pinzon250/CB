@@ -171,7 +171,7 @@ class ProductRepository:
         *,
         name: str,
         slug: Optional[str],
-        description: Optional[str],
+        description: Optional[str] = None,
         price: float,
         stock: int,
         is_active: bool,

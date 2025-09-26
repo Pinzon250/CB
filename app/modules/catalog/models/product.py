@@ -13,7 +13,7 @@ class Product(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     description = Column(Text)
-    slug = Column(String)
+    slug = Column(String, nullable=False, unique=True)
     price = Column(Numeric(10, 2), nullable=False)
     stock =Column(Numeric, default=0)
     is_active =Column(Boolean, default=True)
