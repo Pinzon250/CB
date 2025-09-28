@@ -82,8 +82,6 @@ class ProductService:
                 brand_name=getattr(getattr(p, "brand", None), "name", None),
                 category_name=getattr(getattr(p, "category", None), "name", None),
                 image_url=getattr(p, "_first_image_url", None),
-                created_at=p.created_at,
-                updated_at=p.updated_at,
             ) for p in items
         ]
         return mapped, total

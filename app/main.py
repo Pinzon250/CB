@@ -12,9 +12,40 @@ from app.api.v1.storefront import *
 from app.api.v1.admin import catalog as catalog_adm
 from app.api.v1.admin import auth
 
+description = """
+ChimichangApp API helps you do awesome stuff. 🚀
+
+## Items
+
+You can **read items**.
+
+## Users
+
+You will be able to:
+
+* **Create users** (_not implemented_).
+* **Read users** (_not implemented_).
+"""
 
 # Inicializacion de fastapi
-app = FastAPI(title="Cibercity API v1.0.0-alpha.1")
+app = FastAPI(
+    title="Cibercity API v1.0.0-alpha.1",
+    description=description,
+    summary="Deadpool's favorite app. Nuff said.",
+    version="1.0.0",
+    terms_of_service="http://example.com/terms/",
+    contact={
+        "name": "Santiago Pinzon",
+        "url": "http://x-force.example.com/contact/",
+        "email": "cibercitycolombia@gmail.com",
+    },
+    license_info={
+        "name": "Apache 2.0",
+        "identifier": "MIT",
+    },
+    )
+
+
 
 def create_schemas():
     with engine.begin() as conn:

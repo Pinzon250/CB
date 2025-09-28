@@ -11,8 +11,6 @@ class PublicProductListItem(BaseModel):
     brand_name: Optional[str] = None
     category_name: Optional[str] = None
     image_url: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
 
     model_config = {
         'from_attributes' : True
