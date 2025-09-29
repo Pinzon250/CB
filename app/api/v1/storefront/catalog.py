@@ -8,7 +8,7 @@ from app.modules.catalog.schemas.public import PublicProductDetail
 
 router = APIRouter(
     prefix="/api/v1/storefront/catalog",
-    tags=["Catalogo"]
+    tags=["Catalog"]
 )
 
 @router.get("/products", response_model=Page)
