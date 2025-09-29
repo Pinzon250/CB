@@ -10,41 +10,51 @@ from app.api.v1.storefront import *
 
 # admin routers
 from app.api.v1.admin import catalog as catalog_adm
-from app.api.v1.admin import auth
+from app.api.v1.admin import auth, orders
 
 description = """
-ChimichangApp API helps you do awesome stuff. 🚀
+Cibercity API es el núcleo del ecosistema de comercio electrónico **Cibercity**. 🚀  
 
-## Items
+## Catálogo
+Puedes:
+* **Listar productos** con filtros avanzados.
+* **Consultar categorías** y marcas.
+* **Ver detalles de un producto** con imágenes, precios y stock.  
 
-You can **read items**.
+## Usuarios
+Podrás:
+* **Registrar y autenticar usuarios** con seguridad JWT.
+* **Gestionar perfiles y direcciones de envío**.
+* **Administrar roles y permisos** (cliente, administrador).  
 
-## Users
+## Órdenes y Pagos
+Incluye:
+* **Creación de carritos y pedidos**.
+* **Pagos contra entrega** y otros métodos configurables.
+* **Gestión de estados de orden** y transacciones.  
 
-You will be able to:
-
-* **Create users** (_not implemented_).
-* **Read users** (_not implemented_).
+## Envíos
+Soporta:
+* **Direcciones de envío registradas por el usuario**.
+* **Integración con módulo de logística** (estado del envío, guía de entrega).  
 """
 
-# Inicializacion de fastapi
 app = FastAPI(
-    title="Cibercity API v1.0.0-alpha.1",
+    title="Cibercity API",
     description=description,
-    summary="Deadpool's favorite app. Nuff said.",
-    version="1.0.0",
-    terms_of_service="http://example.com/terms/",
+    summary="Plataforma backend modular para Cibercity E-commerce.",
+    version="1.0.0-alpha.1",
+    terms_of_service="https://cibercity.com/terms/",
     contact={
         "name": "Santiago Pinzon",
-        "url": "http://x-force.example.com/contact/",
+        "url": "https://cibercity.com/contact/",
         "email": "cibercitycolombia@gmail.com",
     },
     license_info={
         "name": "Apache 2.0",
-        "identifier": "MIT",
+        "identifier": "Apache-2.0",
     },
-    )
-
+)
 
 
 def create_schemas():
@@ -68,7 +78,9 @@ def on_startup():
 app.include_router(account.router)
 app.include_router(google_oauth.router)
 app.include_router(catalog.router)
+app.include_router(cart.router)
 
 # Routers admin
 app.include_router(catalog_adm.router)
+app.include_router(orders.router)
 app.include_router(auth.router)
