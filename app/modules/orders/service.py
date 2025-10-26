@@ -39,9 +39,9 @@ class CartService:
     
     @staticmethod
     def update_item(db: Session, user_id: str, item_id: str, quantity: int) -> CartOut:
-        item = CartRepository.update_item_qty(db, item, quantity)
+        item = CartRepository.update_item_qty(db, item_id, quantity)
         db.commit()
-        return CartService.get_cart(db, user_id)
+        return CartService.get_cart(db, user_id, item)
     
     @staticmethod
     def remove_item(db: Session, user_id: str, item_id: str) -> CartOut:
